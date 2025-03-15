@@ -1,0 +1,38 @@
+spring:
+  application:
+    name: zjjt-video-recognizer
+
+  main:
+    web-application-type: servlet
+  undertow:
+    # 每个 I/O 线程的任务队列大小
+    io-threads: 2
+    # 工作线程数量
+    worker-threads: 16
+    # 是否允许直接在请求中使用 URL 编码的斜杠
+    allow-encoded-slash: true
+    # 配置 HTTP 数据接收缓冲区大小
+    buffer-size: 1024
+    # 是否使用直接内存
+    direct-buffers: true
+
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: admin
+    password: admin
+    virtual-host: /
+
+server:
+  port: 8080
+
+
+hikvision:
+  artemis:
+    protocol: https://
+    host: 115.231.10.142:9095
+    app-key: 24425411
+    app-secret: 2zWQybQKhqenIyoSGJbr
+    path: /artemis
+    schema: https
+
