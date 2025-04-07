@@ -3,9 +3,14 @@ package com.douzkj.zjjt.infra.hikvision.api.video.resource.entity;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
+
+/**
+ * 海康设备模型
+ */
 @NoArgsConstructor
 @Data
-public class CameraModel {
+public class HikvisionCameraModel implements Serializable {
 
     /**
      * 海拔

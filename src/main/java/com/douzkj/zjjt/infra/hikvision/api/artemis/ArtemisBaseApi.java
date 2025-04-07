@@ -1,6 +1,8 @@
 package com.douzkj.zjjt.infra.hikvision.api.artemis;
 
+import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
+import com.douzkj.zjjt.infra.hikvision.api.entity.ArtemisPageResponse;
 import com.douzkj.zjjt.infra.hikvision.config.ArtemisConfigProps;
 import com.hikvision.artemis.sdk.ArtemisHttpUtil;
 import com.hikvision.artemis.sdk.config.ArtemisConfig;
@@ -46,6 +48,22 @@ public class ArtemisBaseApi {
         String body = JSONUtil.toJsonStr(request);
         return ArtemisHttpUtil.doPostStringArtemis(artemisConfig, path, body, null, null, "application/json", headers);
 
+    }
+
+
+    public <T> ArtemisPageResponse<T> toPageData(String json, Class<T> clazz) {
+        JSONObject entries = JSONUtil.parseObj(json);
+        ArtemisPageResponse<T> response = new ArtemisPageResponse<>();
+        response.setCode(entries.getStr("code"));
+        response.setMsg(entries.getStr("msg"));
+        JSONObject data = entries.getJSONObject("data");
+        ArtemisPageResponse.ArtemisPageData<T> pageData = new ArtemisPageResponse.ArtemisPageData<>();
+        pageData.setTotal(data.getInt("total"));
+        pageData.setPageNo(data.getInt("pageNo"));
+        pageData.setPageSize(data.getInt("pageSize"));
+        pageData.setList(JSONUtil.toList(data.getJSONArray("list"), clazz));
+        response.setData(pageData);
+        return response;
     }
 
 }

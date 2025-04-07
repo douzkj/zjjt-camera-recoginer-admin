@@ -2,6 +2,7 @@ package com.douzkj.zjjt.scheduler;
 
 import com.douzkj.zjjt.service.CameraCaptureService;
 import com.douzkj.zjjt.service.SignalService;
+import com.douzkj.zjjt.service.SysConfigService;
 import lombok.Data;
 import org.springframework.stereotype.Component;
 
@@ -18,8 +19,10 @@ public class CameraCaptureScheduler {
 
     private final SignalService signalService;
 
+    private final SysConfigService configService;
+
     // 动态周期配置（单位：s），可通过配置中心动态修改
-    private volatile long captureIntervalSeconds = 5 * 60;
+    private volatile long captureIntervalSeconds;
 
     // 定时任务执行器
     private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
@@ -27,6 +30,7 @@ public class CameraCaptureScheduler {
     // 初始化后立即启动调度
     @PostConstruct
     public void init() {
+        captureIntervalSeconds = configService.getCaptureIntervalSeconds();
         scheduleTask();
     }
 

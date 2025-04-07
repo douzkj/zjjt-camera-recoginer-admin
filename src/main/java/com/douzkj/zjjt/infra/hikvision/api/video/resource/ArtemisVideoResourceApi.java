@@ -1,11 +1,11 @@
 package com.douzkj.zjjt.infra.hikvision.api.video.resource;
 
-import cn.hutool.core.lang.TypeReference;
-import cn.hutool.json.JSONUtil;
-import com.douzkj.zjjt.infra.hikvision.api.video.resource.entity.CameraModel;
-import com.douzkj.zjjt.infra.hikvision.api.video.resource.entity.CameraPageRequest;
 import com.douzkj.zjjt.infra.hikvision.api.artemis.ArtemisBaseApi;
 import com.douzkj.zjjt.infra.hikvision.api.entity.ArtemisPageResponse;
+import com.douzkj.zjjt.infra.hikvision.api.video.resource.entity.HikvisionCameraV2Model;
+import com.douzkj.zjjt.infra.hikvision.api.video.resource.request.CameraPageRequest;
+import com.douzkj.zjjt.infra.hikvision.api.video.resource.entity.HikvisionCameraModel;
+import com.douzkj.zjjt.infra.hikvision.api.video.resource.request.CameraPageV2Request;
 import com.douzkj.zjjt.infra.hikvision.config.ArtemisConfigProps;
 
 /**
@@ -22,9 +22,14 @@ public class ArtemisVideoResourceApi extends ArtemisBaseApi {
    /**
     * 分页获取监控点资源
     */
-    public ArtemisPageResponse<CameraModel> getCameras(CameraPageRequest camerasRequest) throws Exception {
+    public ArtemisPageResponse<HikvisionCameraModel> getCameras(CameraPageRequest camerasRequest) throws Exception {
         String postJson = doPostJson("/api/resource/v1/cameras", camerasRequest);
-        return JSONUtil.toBean(postJson, new TypeReference<ArtemisPageResponse<CameraModel>>() {
-        }, true);
+        return toPageData(postJson, HikvisionCameraModel.class);
+    }
+
+
+    public ArtemisPageResponse<HikvisionCameraV2Model> getCamerasV2(CameraPageV2Request camerasRequest) throws Exception {
+        String postJson = doPostJson("/api/resource/v2/camera/search", camerasRequest);
+        return toPageData(postJson, HikvisionCameraV2Model.class);
     }
 }

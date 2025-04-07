@@ -1,30 +1,41 @@
 package com.douzkj.zjjt;
 
-import com.douzkj.zjjt.mq.recognizer.RecognizerQueue;
-import com.douzkj.zjjt.mq.recognizer.RecognizerTask;
+import com.douzkj.zjjt.repository.CameraRepository;
+import com.douzkj.zjjt.repository.SignalRepository;
+import com.douzkj.zjjt.repository.dao.Camera;
+import com.douzkj.zjjt.service.CameraCaptureService;
+import com.google.common.collect.Lists;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-
-import static com.douzkj.zjjt.mq.recognizer.RecognizerQueue.RECOGNIZER_QUEUE;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
 @SpringBootTest(classes = VideoRecognizerApplication.class)
 public class RecognizerQueueTest {
 
+
     @Autowired
-    private RabbitTemplate rabbitTemplate;
+    private CameraCaptureService cameraCaptureService;
+
+    @Autowired
+    private CameraRepository cameraRepository;
+
+    @Autowired
+    private SignalRepository signalRepository;
 
     @Test
     public void testDeliver() {
-        RecognizerTask recognizerTask = new RecognizerTask("xxxxx", "rtsp://wowzaec2demo.streamlock.net/vod/mp4:BigBuckBunny_115k.mov");
-        RecognizerQueue recognizerQueue = new RecognizerQueue(rabbitTemplate);
-        recognizerQueue.deliver(recognizerTask);
+        Camera camera = cameraRepository.getById(851L);
+        CameraCaptureService.SignalRunnerContext context = new CameraCaptureService.SignalRunnerContext(
+                signalRepository.getById(1L), Lists.newArrayList(
+                camera
+                )
+        );
+        cameraCaptureService.executorSignal(context);
+//        RecognizerTask recognizerTask = new RecognizerTask();
+//        RecognizerQueue recognizerQueue = new RecognizerQueue(rabbitTemplate);
+//        recognizerQueue.deliver(recognizerTask);
     }
 }

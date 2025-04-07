@@ -3,6 +3,7 @@ package com.douzkj.zjjt.infra.hikvision.api.entity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import java.util.Collections;
 import java.util.List;
 
 @EqualsAndHashCode(callSuper = true)
@@ -11,10 +12,15 @@ public class ArtemisPageResponse<T> extends ArtemisResponse<ArtemisPageResponse.
 
     @Data
     public static class ArtemisPageData<T> {
-        private Integer total;
-        private Integer pageNo;
-        private Integer pageSize;
-        private List<T> list;
+        private Integer total = 0;
+        private Integer pageNo = 0;
+        private Integer pageSize = 0;
+        private List<T> list = Collections.emptyList();
+    }
+
+
+    public static <T> ArtemisPageResponse<T> empty() {
+        return new ArtemisPageResponse<>();
     }
 
 }

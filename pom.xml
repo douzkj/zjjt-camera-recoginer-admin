@@ -18,6 +18,10 @@
         <hutool.version>5.8.16</hutool.version>
         <distruptor.version>3.4.4</distruptor.version>
         <google-guava.version>33.3.0-jre</google-guava.version>
+        <mybatis-plus.version>3.4.2</mybatis-plus.version>
+        <mapstruct.version>1.5.2.Final</mapstruct.version>
+        <lombok-mapstruct-binding.version>0.2.0</lombok-mapstruct-binding.version>
+        <org.projectlombok.version>1.18.22</org.projectlombok.version>
     </properties>
 
     <dependencyManagement>
@@ -73,10 +77,10 @@
         </dependency>
 
         <!-- redis -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-data-redis</artifactId>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>org.springframework.boot</groupId>-->
+<!--            <artifactId>spring-boot-starter-data-redis</artifactId>-->
+<!--        </dependency>-->
 
         <!-- rabbitmq amqp -->
         <dependency>
@@ -114,6 +118,11 @@
             <artifactId>guava</artifactId>
             <version>${google-guava.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.mapstruct</groupId>
+            <artifactId>mapstruct</artifactId>
+            <version>${mapstruct.version}</version>
+        </dependency>
 
         <dependency>
             <groupId>cn.hutool</groupId>
@@ -144,8 +153,8 @@
             <groupId>com.hikvision.ga</groupId>
             <artifactId>artemis-http-client</artifactId>
             <version>${hikvision-http-client.version}</version>
-            <scope>system</scope>
-            <systemPath>${project.basedir}/libs/artemis-http-client-1.1.13.RELEASE.jar</systemPath>
+<!--            <scope>system</scope>-->
+<!--            <systemPath>${project.basedir}/libs/artemis-http-client-1.1.13.RELEASE.jar</systemPath>-->
         </dependency>
 
         <dependency>
@@ -164,6 +173,19 @@
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpmime</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.baomidou</groupId>
+            <artifactId>mybatis-plus-boot-starter</artifactId>
+            <version>${mybatis-plus.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-quartz</artifactId>
+        </dependency>
     </dependencies>
 
 
@@ -179,6 +201,23 @@
                     <source>${java.version}</source>
                     <target>${java.version}</target>
                     <encoding>${project.build.sourceEncoding}</encoding>
+                    <annotationProcessorPaths>
+                        <path>
+                            <groupId>org.mapstruct</groupId>
+                            <artifactId>mapstruct-processor</artifactId>
+                            <version>${mapstruct.version}</version>
+                        </path>
+                        <path>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                            <version>${org.projectlombok.version}</version>
+                        </path>
+                        <path>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok-mapstruct-binding</artifactId>
+                            <version>${lombok-mapstruct-binding.version}</version>
+                        </path>
+                    </annotationProcessorPaths>
                 </configuration>
             </plugin>
 
@@ -187,23 +226,65 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <version>${spring-boot.version}</version>
-                <configuration>
-                    <mainClass>com.example.Application</mainClass>
-                    <excludes>
-                        <exclude>
-                            <groupId>org.projectlombok</groupId>
-                            <artifactId>lombok</artifactId>
-                        </exclude>
-                    </excludes>
-                </configuration>
+<!--                <configuration>-->
+<!--                    <mainClass>com.douzkj.zjjt.VideoRecognizerApplication</mainClass>-->
+<!--                    <excludes>-->
+<!--                        <exclude>-->
+<!--                            <groupId>org.projectlombok</groupId>-->
+<!--                            <artifactId>lombok</artifactId>-->
+<!--                        </exclude>-->
+<!--                    </excludes>-->
+<!--                    <skip>false</skip>-->
+<!--                </configuration>-->
                 <executions>
                     <execution>
+                        <id>repackage</id>
                         <goals>
                             <goal>repackage</goal>
                         </goals>
                     </execution>
                 </executions>
             </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>3.5.0</version>
+                <executions>
+                    <execution>
+                        <id>make-assembly</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                        <configuration>
+                            <archive>
+                                <manifest>
+                                    <mainClass>com.douzkj.zjjt.VideoRecognizerApplication</mainClass> <!-- 替换为你的主类 -->
+                                </manifest>
+                            </archive>
+                            <descriptorRefs>
+                                <descriptorRef>jar-with-dependencies</descriptorRef>
+                            </descriptorRefs>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <!-- 配置 maven-surefire-plugin 跳过测试 -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>3.1.2</version> <!-- 可以根据需要调整版本 -->
+                <configuration>
+                    <skipTests>true</skipTests>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>3.1.0</version>
+            </plugin>
+
         </plugins>
     </build>
 </project>

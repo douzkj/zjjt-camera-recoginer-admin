@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.douzkj.zjjt.repository.mapper.SignalMapper">
+    <select id="listCameraCnt" resultType="com.douzkj.zjjt.repository.dao.SignalCameraCount">
+        select s.*, c.cnt as `camera_cnt` from signals s left join (
+            select signal_id, count(*) as cnt from cameras group by signal_id
+        ) as c on s.id = c.signal_id order by s.sort desc, s.id asc
+    </select>
+</mapper>

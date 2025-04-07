@@ -1,6 +1,11 @@
 spring:
   application:
     name: zjjt-video-recognizer
+  datasource:
+    url: jdbc:mysql://${MYSQL_HOST:localhost}:${MYSQL_PORT:3306}/${MYSQL_DB:zjjt_camera_recognizer}?useUnicode=true&serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=utf8&useSSL=false&nullCatalogMeansCurrent=true&allowPublicKeyRetrieval=true
+    username: ${MYSQL_USER:root}
+    password: ${MYSQL_PASS:123456}
+    driver-class-name: com.mysql.cj.jdbc.Driver
 
   main:
     web-application-type: servlet
@@ -17,22 +22,44 @@ spring:
     direct-buffers: true
 
   rabbitmq:
-    host: localhost
-    port: 5672
-    username: admin
-    password: admin
-    virtual-host: /
+    host: ${RABBITMQ_HOST:localhost}
+    port: ${RABBITMQ_PORT:5672}
+    username: ${RABBITMQ_USER:admin}
+    password:  ${RABBITMQ_PASS:admin}
+    virtual-host: ${RABBITMQ_VHOST:/}
+    publisher-confirm-type: correlated  # 启用异步确认
+    publisher-returns: true             # 启用退回机制
+    template:
+      mandatory: true                   # 强制路由失败时退回消息
 
+
+mybatis-plus:
+  global-config:
+    db-config:
+      id-type: auto #字段策略
+      insert-strategy: not_null
+      update-strategy: not_null
+      select-strategy: not_empty #驼峰下划线转换
+      table-underline: true # 逻辑删除配置
+      logic-delete-field: deleted_at # 逻辑未删除全局值（0表示未删除，这也是Mybatis Plus的默认配置）
+      logic-not-delete-value: "NULL"
+      logic-delete-value: now()
+  configuration:
+    map-underscore-to-camel-case: true
+    cache-enabled: false
+#    log-impl: org.apache.ibatis.logging.nologging.NoLoggingImpl
 server:
-  port: 8080
+  port: ${SERVER_PORT:8080}
 
 
 hikvision:
   artemis:
     protocol: https://
-    host: 115.231.10.142:9095
-    app-key: 24425411
-    app-secret: 2zWQybQKhqenIyoSGJbr
+    host: ${HIKVISION_HOST:115.231.10.142:9095}
+    app-key: ${HIKVISION_APP_KEY:24425411}
+    app-secret: ${HIKVISION_APP_SECRET:2zWQybQKhqenIyoSGJbr}
     path: /artemis
     schema: https
+  sync:
+    cameraInteralSeconds: 3600
 
