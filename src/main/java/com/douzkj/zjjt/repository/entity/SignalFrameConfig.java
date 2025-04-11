@@ -25,7 +25,7 @@ public class SignalFrameConfig implements Serializable {
         public static final FrameReadConfig DEFAULT;
         static {
             DEFAULT = new FrameReadConfig();
-            DEFAULT.setFrameIntervalSeconds(1);
+            DEFAULT.setFrameIntervalSeconds(5);
             DEFAULT.setFrameRetryTimes(3);
             DEFAULT.setFrameRetryInterval(1);
             DEFAULT.setFrameWindow(10);
