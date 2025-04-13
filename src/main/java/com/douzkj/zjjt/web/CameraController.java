@@ -63,7 +63,7 @@ public class CameraController {
     /**
      * 绑定设备至指定通路
      */
-    @PostMapping("bind")
+    @PostMapping("/bind")
     public Response<Boolean> bind(@RequestBody @Valid CameraSignalBindParam bindParam) {
         Long signalId = bindParam.getSignalId();
         boolean res = false;

@@ -2,6 +2,7 @@ package com.douzkj.zjjt.service;
 
 import cn.hutool.core.lang.UUID;
 import cn.hutool.json.JSONUtil;
+import com.douzkj.zjjt.repository.CameraRepository;
 import com.douzkj.zjjt.repository.SignalRepository;
 import com.douzkj.zjjt.repository.dao.Camera;
 import com.douzkj.zjjt.repository.dao.Signal;
@@ -18,9 +19,6 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -31,11 +29,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
 @Data
 public class CameraCaptureService {
 
-    private final SignalService signalService;
+    private final CameraRepository cameraRepository;
 
     private final SignalRepository signalRepository;
-
-    private final SysConfigService sysConfigService;
 
     private final HikvisionService hikvisionService;
 
@@ -50,36 +46,19 @@ public class CameraCaptureService {
     }
 
 
-    /**
-     * 开始采集
-     */
-    public void capture() {
-        if (running.compareAndSet(false, true)) {
-            String runnerId = generateTaskId();
-            //获取所有通路以及设备列表
-            Map<Long, List<Camera>> signalDevices = signalService.getSignalDevices();
-
-            int captureParallelism = sysConfigService.getCaptureParallelism();
-            int signalSize = signalDevices.size();
-            if (signalSize == 0) {
-                return;
-            }
-            /*
-              判断并行度是否是大于通路数量
-              大于则取通路数量
-              小于则取并行度
-             */
-            int poolSize = Math.min(captureParallelism, signalSize);
-            ExecutorService executorService = Executors.newFixedThreadPool(poolSize);
-            for (Map.Entry<Long, List<Camera>> signalEntry : signalDevices.entrySet()) {
-                Long signalId = signalEntry.getKey();
-                Signal signal = signalRepository.getById(signalId);
-                List<Camera> signalCameras = signalEntry.getValue();
-                SignalRunnerContext signalRunnerContext = new SignalRunnerContext(runnerId, signal, signalCameras);
-                executorService.execute(() -> executorSignal(signalRunnerContext));
-            }
+    public void capture(Long signalId) {
+        Signal signal = signalRepository.getById(signalId);
+        if (signal == null) {
+            log.warn("signal {} not exist", signalId);
+            return;
         }
-        running.set(false);
+        if (!signal.isOpened()) {
+            log.warn("signal {} is not opened", signalId);
+            return;
+        }
+        List<Camera> signalCameras = cameraRepository.getCamerasBySignalId(signal.getId());
+        SignalRunnerContext signalRunnerContext = new SignalRunnerContext(generateTaskId(), signal, signalCameras);
+        execute(signalRunnerContext);
     }
 
     /**
@@ -87,7 +66,7 @@ public class CameraCaptureService {
      *
      * @param runnerContext
      */
-    public void executorSignal(SignalRunnerContext runnerContext) {
+    public void execute(SignalRunnerContext runnerContext) {
         //依次获取设备的RTSP
         List<Camera> devices = runnerContext.getDevices();
         for (Camera device : devices) {

@@ -1,5 +1,7 @@
 package com.douzkj.zjjt.web.vo;
 
+import com.douzkj.zjjt.entity.enums.SignalType;
+import com.douzkj.zjjt.repository.entity.SignalConfig;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -26,6 +28,8 @@ public class SignalVO implements Serializable {
      */
     private String name;
 
+    private String description;
+
     /**
      * 设备数量
      */
@@ -34,4 +38,14 @@ public class SignalVO implements Serializable {
     private LocalDateTime createdAt;
 
     private LocalDateTime updatedAt;
+
+    private Integer status;
+
+    private SignalType type;
+
+    private SignalConfig config;
+
+    private Long openedAtMs;
+    private Long closedAtMs;
+    private Long latestClosedAtMs;
 }

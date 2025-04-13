@@ -2,6 +2,8 @@ package com.douzkj.zjjt.repository.entity;
 
 import lombok.Data;
 
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 
 /**
@@ -13,6 +15,12 @@ import java.io.Serializable;
 @Data
 public class SignalConfig implements Serializable {
 
+    @NotNull
+    @Valid
     private SignalFrameConfig frame;
+
+    @NotNull
+    @Valid
+    private SignalAlgoConfig algo;
 
 }

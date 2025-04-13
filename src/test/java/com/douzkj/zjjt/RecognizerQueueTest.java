@@ -33,7 +33,7 @@ public class RecognizerQueueTest {
                 camera
                 )
         );
-        cameraCaptureService.executorSignal(context);
+        cameraCaptureService.execute(context);
 //        RecognizerTask recognizerTask = new RecognizerTask();
 //        RecognizerQueue recognizerQueue = new RecognizerQueue(rabbitTemplate);
 //        recognizerQueue.deliver(recognizerTask);

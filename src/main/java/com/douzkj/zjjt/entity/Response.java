@@ -24,17 +24,20 @@ public class Response<T> implements Serializable {
     private String msg;
     private T data;
 
+    private boolean success;
+
     private Response(Integer code, String msg, T data) {
         this.code = code;
         this.msg = msg;
         this.data = data;
+        this.success = code == SUCCESS_CODE;
     }
 
     private Response(Integer code, String msg) {
         this(code, msg, null);
     }
 
-    public Response() {
+    private Response() {
     }
 
     public static <T> Response<T> success() {
@@ -58,8 +61,6 @@ public class Response<T> implements Serializable {
     public static <T> Response<T> fail(String msg, T data) {
         return new Response<T>(INTERVAL_ERRORCODE, msg, data);
     }
-
-
 
 
 }

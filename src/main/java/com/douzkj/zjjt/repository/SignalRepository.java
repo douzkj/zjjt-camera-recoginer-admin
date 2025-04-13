@@ -1,6 +1,8 @@
 package com.douzkj.zjjt.repository;
 
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.douzkj.zjjt.common.SignalConst;
 import com.douzkj.zjjt.repository.dao.Signal;
 import com.douzkj.zjjt.repository.dao.SignalCameraCount;
 import com.douzkj.zjjt.repository.mapper.SignalMapper;
@@ -26,5 +28,20 @@ public class SignalRepository extends ServiceImpl<SignalMapper, Signal> {
             return updateById(entity);
         }
         return super.save(entity);
+    }
+
+
+    public List<Signal> getOpenedSignals() {
+        return this.list(Wrappers.<Signal>lambdaQuery().eq(Signal::getStatus, SignalConst.SIGNAL_OPENED));
+    }
+
+
+    public List<Signal> getOpenedButNotClosedSignals() {
+        return this.list(Wrappers.<Signal>lambdaQuery()
+                .eq(Signal::getStatus, SignalConst.SIGNAL_OPENED)
+                .isNotNull(Signal::getClosedAtMs)
+                .ne(Signal::getClosedAtMs, 0)
+                .lt(Signal::getClosedAtMs, System.currentTimeMillis())
+        );
     }
 }
