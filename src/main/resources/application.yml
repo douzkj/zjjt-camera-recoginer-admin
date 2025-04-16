@@ -47,8 +47,8 @@ mybatis-plus:
   configuration:
     map-underscore-to-camel-case: true
     cache-enabled: false
-    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl # 控制台打印完整SQL
-#    log-impl: org.apache.ibatis.logging.nologging.NoLoggingImpl
+#    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl # 控制台打印完整SQL
+    log-impl: org.apache.ibatis.logging.nologging.NoLoggingImpl
 server:
   port: ${SERVER_PORT:8080}
 
@@ -63,4 +63,9 @@ hikvision:
     schema: https
   sync:
     cameraInteralSeconds: 3600
+
+
+alog:
+  server:
+    endpoint: ${ALGO_SERVER_ENDPOINT:http://localhost:9001}
 

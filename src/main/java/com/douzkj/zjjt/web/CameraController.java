@@ -3,13 +3,16 @@ package com.douzkj.zjjt.web;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.douzkj.zjjt.entity.Response;
+import com.douzkj.zjjt.infra.algo.AlgoServer;
 import com.douzkj.zjjt.repository.CameraRepository;
 import com.douzkj.zjjt.repository.SignalRepository;
 import com.douzkj.zjjt.repository.dao.Camera;
 import com.douzkj.zjjt.repository.dao.Signal;
+import com.douzkj.zjjt.service.HikvisionService;
 import com.douzkj.zjjt.web.convertor.CameraConvertor;
 import com.douzkj.zjjt.web.param.CameraPageRequest;
 import com.douzkj.zjjt.web.param.CameraSignalBindParam;
+import com.douzkj.zjjt.web.param.CameraViewParam;
 import com.douzkj.zjjt.web.vo.CameraVO;
 import com.douzkj.zjjt.web.vo.PageVO;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,6 +43,12 @@ public class CameraController {
 
     @Autowired
     private SignalRepository signalRepository;
+
+    @Autowired
+    private HikvisionService hikvisionService;
+
+    @Autowired
+    private AlgoServer algoServer;
 
 
     @GetMapping("/page")
@@ -73,6 +82,20 @@ public class CameraController {
             res = cameraRepository.bind(bindParam.getCameraIds(), signalId);
         }
         return Response.success(res);
+    }
+
+    @PostMapping("/view")
+    public Response<String> readFrame(@RequestBody @Valid CameraViewParam viewParam) {
+        String indexCode = viewParam.getIndexCode();
+        String cameraRtspUrl = hikvisionService.getCameraRtspUrl(indexCode);
+        if (cameraRtspUrl == null) {
+            return Response.fail("获取设备rtsp异常");
+        }
+        com.douzkj.zjjt.infra.algo.Response<String> viewResponse = algoServer.readFrame(cameraRtspUrl);
+        if (viewResponse.isOK()) {
+            return Response.success(viewResponse.getData());
+        }
+        return Response.fail("读取设备RTSP流["+cameraRtspUrl+"]异常. "+ viewResponse.getMessage());
     }
 
 }
