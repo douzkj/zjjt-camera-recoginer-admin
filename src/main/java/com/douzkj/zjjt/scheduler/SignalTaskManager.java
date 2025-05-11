@@ -3,6 +3,7 @@ package com.douzkj.zjjt.scheduler;
 import com.douzkj.zjjt.repository.SignalRepository;
 import com.douzkj.zjjt.repository.dao.Signal;
 import com.douzkj.zjjt.service.CameraCaptureService;
+import com.douzkj.zjjt.service.CameraService;
 import com.google.common.collect.Maps;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
@@ -14,10 +15,7 @@ import javax.annotation.PreDestroy;
 import javax.validation.constraints.NotNull;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -25,16 +23,19 @@ import java.util.stream.Collectors;
 @Data
 public class SignalTaskManager {
 
-    private final Map<Long, ScheduledFuture<?>> signalTasks = Maps.newConcurrentMap();
+    private final Map<Long, ScheduledExecutorService> signalTasks = Maps.newConcurrentMap();
 
-    private final static long intervalSeconds = 330;
+    private final static long intervalSeconds = 5;
 
     private final CameraCaptureService cameraCaptureService;
 
     private final SignalRepository signalRepository;
 
+    private final CameraService cameraService;
+
+
     // 共享的 ScheduledExecutorService，线程数量可以根据实际情况调整
-    private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(Math.max(Runtime.getRuntime().availableProcessors() * 2, 16));
+//    private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(Math.max(Runtime.getRuntime().availableProcessors() * 2, 16));
 
 
     /**
@@ -65,29 +66,48 @@ public class SignalTaskManager {
     }
 
     public void addTask(Signal signal) {
-        if (signal != null && signal.isOpened()) {
-            signalTasks.putIfAbsent(signal.getId(), createTask(signal));
+        if (signal != null) {
+            if (signalTasks.putIfAbsent(signal.getId(), createTask(signal)) == null) {
+                log.info("成功为通路 {} 添加任务", signal.getId());
+            } else {
+                log.warn("通路 {} 任务已存在，跳过添加", signal.getId());
+            }
         }
     }
 
-    protected ScheduledFuture<?> createTask(Signal signal) {
+    protected ScheduledExecutorService createTask(Signal signal) {
         log.info("添加通路采集任务：{}", signal.getId());
-        return scheduler
+        Long signalId = signal.getId();
+        ScheduledExecutorService scheduledExecutor = Executors.newSingleThreadScheduledExecutor();
+        scheduledExecutor
                 .scheduleAtFixedRate(
                         () -> {
-                            cameraCaptureService.capture(signal.getId());
+                            cameraService.syncRtspUrl(signalId);
                         },
-                        0,
+                        1,
                         intervalSeconds
                         ,
                         TimeUnit.SECONDS
                 );
+        return scheduledExecutor;
     }
 
     public void removeTask(@NotNull(message = "通道不能为空") Long signalId) {
-        ScheduledFuture<?> remove = signalTasks.remove(signalId);
+        ScheduledExecutorService remove = signalTasks.remove(signalId);
         if (remove != null) {
-            remove.cancel(true);
+            shutdownScheduler(remove);
+            log.info("成功移除通路 {} 的任务并取消调度", signalId);
+        }
+    }
+
+    public void shutdownScheduler(ExecutorService executorService) {
+        try {
+            executorService.shutdown();
+            if (!executorService.awaitTermination(60, TimeUnit.SECONDS)) {
+                executorService.shutdownNow();
+            }
+        } catch (InterruptedException e) {
+            executorService.shutdownNow();
         }
     }
 
@@ -96,14 +116,13 @@ public class SignalTaskManager {
      */
     @PreDestroy
     public void shutdown() {
-        scheduler.shutdown();
-        try {
-            if (!scheduler.awaitTermination(60, TimeUnit.SECONDS)) {
-                scheduler.shutdownNow();
+        for (Map.Entry<Long, ScheduledExecutorService> scheduledFutureEntry : signalTasks.entrySet()) {
+            ScheduledExecutorService scheduler = scheduledFutureEntry.getValue();
+            try {
+                shutdownScheduler(scheduler);
+            } catch (Exception e) {
+                Thread.currentThread().interrupt();
             }
-        } catch (InterruptedException e) {
-            scheduler.shutdownNow();
-            Thread.currentThread().interrupt();
         }
     }
 }

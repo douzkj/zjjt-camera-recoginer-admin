@@ -25,7 +25,7 @@ public class SignalScheduler {
     @Scheduled(fixedRate = 5000)
     public void closeTask() {
         log.info("entry closeTask ");
-        List<Signal> signals = signalRepository.getOpenedButNotClosedSignals();
+        List<Signal> signals = signalRepository.getNeedAutoClosedSignals();
         for (Signal signal : signals) {
             log.info("openedButNotClosed. close signal. id={}", signal.getId());
             signalService.close(signal.getId());

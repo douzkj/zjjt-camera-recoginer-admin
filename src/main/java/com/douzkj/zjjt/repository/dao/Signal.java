@@ -67,6 +67,11 @@ public class Signal extends Base {
      */
     private Long closedAtMs;
 
+    /**
+     * 当前任务ID
+     */
+    private String currentTaskId;
+
     @Override
     public boolean equals(Object o) {
         if (!(o instanceof Signal)) return false;

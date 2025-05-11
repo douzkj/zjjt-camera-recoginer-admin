@@ -47,5 +47,12 @@ public class SignalVO implements Serializable {
 
     private Long openedAtMs;
     private Long closedAtMs;
+
     private Long latestClosedAtMs;
+
+    private Long frameImageCnt;
+
+    private Long labelImageCnt;
+
+    private Long labelJsonCnt;
 }

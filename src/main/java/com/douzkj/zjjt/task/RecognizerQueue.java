@@ -16,6 +16,9 @@ public class RecognizerQueue {
     // 识别任务队列
     public static final String RECOGNIZER_QUEUE = "zjjt:camera_recognizer:task";
 
+    public static final String COLLECTION_QUEUE = "zjjt:camera_recognizer:collection";
+    public static final String COLLECTION_QUEUE_V2 = "zjjt:camera_recognizer:collection:v2";
+
 
     public void deliver(RecognizerTask recognizerTask) {
         log.info("发送识别任务到队列:{}", JSONUtil.toJsonStr(recognizerTask));

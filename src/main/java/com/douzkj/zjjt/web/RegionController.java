@@ -1,6 +1,6 @@
 package com.douzkj.zjjt.web;
 
-import com.douzkj.zjjt.entity.Response;
+import com.douzkj.zjjt.entity.R;
 import com.douzkj.zjjt.repository.RegionRepository;
 import com.douzkj.zjjt.repository.dao.CameraRegion;
 import com.douzkj.zjjt.web.convertor.RegionConvertor;
@@ -26,9 +26,9 @@ public class RegionController {
     private final RegionRepository regionRepository;
 
     @GetMapping("/options")
-    public Response<List<RegionVO>> selectOptions() {
+    public R<List<RegionVO>> selectOptions() {
         List<CameraRegion> regions = regionRepository.list();
         List<RegionVO> regionVOS = RegionConvertor.INSTANCE.do2Vo(regions);
-        return Response.success(regionVOS);
+        return R.success(regionVOS);
     }
 }

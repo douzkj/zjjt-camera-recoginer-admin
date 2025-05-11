@@ -2,7 +2,7 @@ package com.douzkj.zjjt.web;
 
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.douzkj.zjjt.entity.Response;
+import com.douzkj.zjjt.entity.R;
 import com.douzkj.zjjt.infra.algo.AlgoServer;
 import com.douzkj.zjjt.repository.CameraRepository;
 import com.douzkj.zjjt.repository.SignalRepository;
@@ -52,7 +52,7 @@ public class CameraController {
 
 
     @GetMapping("/page")
-    public Response<PageVO<CameraVO>> page(@Valid CameraPageRequest param) {
+    public R<PageVO<CameraVO>> page(@Valid CameraPageRequest param) {
         Wrapper<Camera> wrapper = param.toWrapper();
         Page<Camera> page = cameraRepository.page(new Page<>(param.getCurrent(), param.getPageSize()), wrapper);
         Set<Long> signalIds = page.getRecords().stream()
@@ -60,7 +60,7 @@ public class CameraController {
                 .filter(Objects::nonNull)
                 .collect(Collectors.toSet());
         List<Signal> signals = ! CollectionUtils.isEmpty(signalIds) ? signalRepository.listByIds(signalIds) : Collections.emptyList();
-        return Response.success(PageVO.of(page, o -> {
+        return R.success(PageVO.of(page, o -> {
             CameraVO cameraVO = CameraConvertor.INSTANCE.do2Vo(o);
             signals.stream().filter(s -> Objects.equals(s.getId(), o.getSignalId())).findFirst()
                     .ifPresent(signal -> cameraVO.setSignalName(signal.getName()));
@@ -73,7 +73,7 @@ public class CameraController {
      * 绑定设备至指定通路
      */
     @PostMapping("/bind")
-    public Response<Boolean> bind(@RequestBody @Valid CameraSignalBindParam bindParam) {
+    public R<Boolean> bind(@RequestBody @Valid CameraSignalBindParam bindParam) {
         Long signalId = bindParam.getSignalId();
         boolean res = false;
         if (signalId == null) {
@@ -81,21 +81,21 @@ public class CameraController {
         } else {
             res = cameraRepository.bind(bindParam.getCameraIds(), signalId);
         }
-        return Response.success(res);
+        return R.success(res);
     }
 
     @PostMapping("/view")
-    public Response<String> readFrame(@RequestBody @Valid CameraViewParam viewParam) {
+    public R<String> readFrame(@RequestBody @Valid CameraViewParam viewParam) {
         String indexCode = viewParam.getIndexCode();
         String cameraRtspUrl = hikvisionService.getCameraRtspUrl(indexCode);
         if (cameraRtspUrl == null) {
-            return Response.fail("获取设备rtsp异常");
+            return R.fail("获取设备rtsp异常");
         }
         com.douzkj.zjjt.infra.algo.Response<String> viewResponse = algoServer.readFrame(cameraRtspUrl);
         if (viewResponse.isOK()) {
-            return Response.success(viewResponse.getData());
+            return R.success(viewResponse.getData());
         }
-        return Response.fail("读取设备RTSP流["+cameraRtspUrl+"]异常. "+ viewResponse.getMessage());
+        return R.fail("读取设备RTSP流["+cameraRtspUrl+"]异常. "+ viewResponse.getMsg());
     }
 
 }

@@ -31,12 +31,21 @@ public class SignalRepository extends ServiceImpl<SignalMapper, Signal> {
     }
 
 
+    /**
+     * 获取开启状态的通路
+     *
+     * @return
+     */
     public List<Signal> getOpenedSignals() {
         return this.list(Wrappers.<Signal>lambdaQuery().eq(Signal::getStatus, SignalConst.SIGNAL_OPENED));
     }
 
 
-    public List<Signal> getOpenedButNotClosedSignals() {
+    /**
+     * 获取开启但是需要关闭的通路
+     * @return
+     */
+    public List<Signal> getNeedAutoClosedSignals() {
         return this.list(Wrappers.<Signal>lambdaQuery()
                 .eq(Signal::getStatus, SignalConst.SIGNAL_OPENED)
                 .isNotNull(Signal::getClosedAtMs)

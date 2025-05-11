@@ -1,12 +1,11 @@
 package com.douzkj.zjjt.web;
 
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
-import com.douzkj.zjjt.entity.Response;
+import com.douzkj.zjjt.entity.R;
 import com.douzkj.zjjt.repository.SysConfigRepository;
 import com.douzkj.zjjt.repository.dao.SysConfig;
 import lombok.Data;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -30,7 +29,7 @@ public class SysConfigController {
 
     @PostMapping("/save")
     @Transactional(rollbackFor = Exception.class)
-    public Response<Boolean> save(@RequestBody Map<String, String> values) {
+    public R<Boolean> save(@RequestBody Map<String, String> values) {
         for (Map.Entry<String, String> stringObjectEntry : values.entrySet()) {
             String key = stringObjectEntry.getKey();
             String value = stringObjectEntry.getValue();
@@ -41,18 +40,18 @@ public class SysConfigController {
                     Wrappers.<SysConfig>lambdaQuery().eq(SysConfig::getCfKey, key)
             );
         }
-        return Response.success();
+        return R.success();
     }
 
 
     @GetMapping("/")
-    public Response<Map<String, String>> getSysConfig() {
+    public R<Map<String, String>> getSysConfig() {
         List<SysConfig> list = sysConfigRepository.list();
         Map<String, String> res = new HashMap<>();
         for (SysConfig sysConfig : list) {
             res.put(sysConfig.getCfKey(), sysConfig.getCfValue());
         }
-        return Response.success(res);
+        return R.success(res);
     }
 
 

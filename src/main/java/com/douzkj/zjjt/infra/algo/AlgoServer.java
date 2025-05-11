@@ -1,35 +1,44 @@
 package com.douzkj.zjjt.infra.algo;
 
 import cn.hutool.http.HttpUtil;
+import cn.hutool.json.JSONNull;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
+import com.douzkj.zjjt.infra.algo.entity.CleanupCount;
 import com.google.common.collect.ImmutableMap;
 import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
 
 @Service
 @Data
+@Slf4j
 public class AlgoServer {
 
     private final AlgoServerProps algoServerProps;
 
-
+    /**
+     * 读取帧
+     * @param rtspUrl
+     * @return
+     */
     public Response<String> readFrame(String rtspUrl) {
         return get("/rtsp/frame", ImmutableMap.of("url", rtspUrl), String.class);
     }
 
+    public Response<CleanupCount> cleanupSimilarImages(String folder) {
+        return get("/task/cleanup/similar", ImmutableMap.of("folder", folder), CleanupCount.class);
+    }
 
-    protected  <T> Response<T> get(String path, Map<String, Object> params, Class<T> clazz) {
-        String url = algoServerProps.getEndpoint() + path;
-        String s = HttpUtil.get(url, params);
-        JSONObject entries = JSONUtil.parseObj(s);
+    protected <T> Response<T> unSerializer(String res, Class<T> clazz) {
+        JSONObject entries = JSONUtil.parseObj(res);
         Response<T> response = new Response<>();
         response.setCode(entries.getInt("code"));
-        response.setMessage(entries.getStr("message"));
+        response.setMsg(entries.getStr("msg"));
         Object dataObj = entries.get("data");
-        if (dataObj != null) {
+        if (dataObj != null && !JSONNull.NULL.equals(dataObj)) {
             if (clazz.isPrimitive() || isWrapperClass(clazz)) {
                 // 处理基础类型及其包装类
                 dataObj = convertPrimitive(dataObj, clazz);
@@ -44,6 +53,18 @@ public class AlgoServer {
         return response;
     }
 
+    protected  <T> Response<T> get(String path, Map<String, Object> params, Class<T> clazz) {
+        String url = algoServerProps.getEndpoint() + path;
+        String s = HttpUtil.get(url, params);
+        log.info("get url:{} \t ----> res: {}", url, s);
+        return unSerializer(s, clazz);
+    }
+
+    protected  <T> Response<T> post(String path, Object data, Class<T> clazz) {
+        String url = algoServerProps.getEndpoint() + path;
+        String s = HttpUtil.post(url, JSONUtil.toJsonStr(data));
+        return unSerializer(s, clazz);
+    }
 
     // 判断是否为包装类
     private boolean isWrapperClass(Class<?> clazz) {

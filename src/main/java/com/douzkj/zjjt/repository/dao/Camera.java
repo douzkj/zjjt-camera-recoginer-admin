@@ -1,6 +1,5 @@
 package com.douzkj.zjjt.repository.dao;
 
-import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -48,7 +47,13 @@ public class Camera extends Base {
 
     private String currentRunId;
 
-    private String currentRtspUrl;
+    private String latestRtspUrl;
+
+    private Long latestRtspCreatedTime;
+
+    private Long latestRtspExpiredTime;
+
+    private String addr;
 
     private LocalDateTime hkCreatedAt;
 

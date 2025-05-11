@@ -1,25 +1,19 @@
 package com.douzkj.zjjt.repository;
 
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
-import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.douzkj.zjjt.repository.dao.Camera;
+import com.douzkj.zjjt.repository.entity.SignalCameraCntVO;
 import com.douzkj.zjjt.repository.mapper.CameraMapper;
-import com.google.common.collect.Maps;
 import lombok.Data;
-import org.assertj.core.util.Lists;
-import org.springframework.aop.framework.AopContext;
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * @author ranger dong
@@ -52,17 +46,37 @@ public class CameraRepository extends ServiceImpl<CameraMapper, Camera> {
         return signalId == null ? Collections.emptyList() : list(Wrappers.<Camera>lambdaQuery().eq(Camera::getSignalId, signalId));
     }
 
-    public Map<Long, Long> countBySignalIds(List<Long> signalIds) {
+    public Map<Long, Integer> countBySignalIds(List<Long> signalIds) {
         if (signalIds == null || signalIds.isEmpty()) {
             return Collections.emptyMap();
         }
-//        Wrapper<Camera> wrapper = QueryWrapper<>.in(Camera::getSignalId, signalIds).groupBy(Camera::getSignalId).select("signal_id", "count(*)");
-//        List<Map<String, Object>> maps = getBaseMapper().selectMaps(wrapper);
-//        Map<Long, Long> res = Maps.newHashMap();
-        return Collections.emptyMap();
+        Wrapper<Camera> wrapper = Wrappers.<Camera>lambdaQuery().in(Camera::getSignalId, signalIds);
+        List<SignalCameraCntVO> signalCameraCntVOS = getBaseMapper().countBySignalId(wrapper);
+        if (signalCameraCntVOS == null || signalCameraCntVOS.isEmpty()) {
+            return Collections.emptyMap();
+        }
+        return signalCameraCntVOS.stream().collect(java.util.stream.Collectors.toMap(SignalCameraCntVO::getSignalId, SignalCameraCntVO::getCameraCnt));
     }
 
     public List<Camera> getCamerasBySignalId(Long signalId) {
         return list(Wrappers.<Camera>lambdaQuery().eq(Camera::getSignalId, signalId));
+    }
+
+    public List<Camera> getCamerasBySignalIds(List<Long> signalIds) {
+        return list(Wrappers.<Camera>lambdaQuery().in(Camera::getSignalId, signalIds));
+    }
+
+
+    public Camera getByIndexCode(String indexCode) {
+        return getOne(Wrappers.<Camera>lambdaQuery().eq(Camera::getIndexCode, indexCode), false);
+    }
+
+    public boolean updateRtspUrl(Long id, String rtspUrl, long rtspCreatedTimeMs, long rtspExpiredTimeMs) {
+        LambdaUpdateWrapper<Camera> set = Wrappers.<Camera>lambdaUpdate()
+                .eq(Camera::getId, id)
+                .set(Camera::getLatestRtspUrl, rtspUrl)
+                .set(Camera::getLatestRtspCreatedTime, rtspCreatedTimeMs)
+                .set(Camera::getLatestRtspExpiredTime, rtspExpiredTimeMs);
+        return this.update(set);
     }
 }

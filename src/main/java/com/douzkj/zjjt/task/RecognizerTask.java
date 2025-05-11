@@ -1,11 +1,14 @@
 package com.douzkj.zjjt.task;
 
 import com.douzkj.zjjt.repository.entity.SignalConfig;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 
 @Data
+@NoArgsConstructor
 public class RecognizerTask implements Serializable {
     private static final long serialVersionUID = 1L;
 
@@ -45,6 +48,8 @@ public class RecognizerTask implements Serializable {
 
 
     @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class CameraDTO implements Serializable {
         /**
          * 监控点唯一标识
@@ -59,6 +64,7 @@ public class RecognizerTask implements Serializable {
     }
 
     @Data
+    @NoArgsConstructor
     public static class CameraRtspDTO implements Serializable {
 
         private String url;
@@ -86,6 +92,8 @@ public class RecognizerTask implements Serializable {
     }
 
     @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class SignalDTO implements Serializable {
 
     	private String signalId;

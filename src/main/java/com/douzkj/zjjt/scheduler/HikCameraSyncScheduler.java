@@ -8,12 +8,11 @@ import com.douzkj.zjjt.repository.dao.Camera;
 import com.douzkj.zjjt.service.HikvisionService;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
 import java.util.List;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -27,20 +26,13 @@ import java.util.concurrent.atomic.AtomicBoolean;
 @Slf4j
 public class HikCameraSyncScheduler {
 
-
     private  AtomicBoolean running = new AtomicBoolean(false);
 
     private final HikvisionService hikvisionService;
     private final CameraRepository cameraRepository;
 
-    // 定时任务执行器
-    private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
-
-    @PostConstruct
-    public void init() {
-        scheduler.scheduleAtFixedRate(this::syncCamera, hikvisionService.getCameraSyncIntervalSeconds(), hikvisionService.getCameraSyncIntervalSeconds(), java.util.concurrent.TimeUnit.SECONDS);
-    }
-
+    @Async("asyncExecutor")
+    @Scheduled(fixedRate = 60 * 60, timeUnit = java.util.concurrent.TimeUnit.SECONDS, initialDelay = 30 * 60)
     public void syncCamera() {
         if (running.compareAndSet(false, true)) {
             int pageNo = 1;

@@ -10,6 +10,7 @@ import com.douzkj.zjjt.repository.entity.SignalConfig;
 import com.douzkj.zjjt.task.RecognizerQueue;
 import com.douzkj.zjjt.task.RecognizerTask;
 import com.douzkj.zjjt.task.TaskConvertor;
+import com.douzkj.zjjt.utils.TimeUtils;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -41,12 +42,12 @@ public class CameraCaptureService {
 
 
     public static String generateTaskId() {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
-        return LocalDateTime.now(ZoneId.of("Asia/Shanghai")).format(formatter);
+        return TimeUtils.generateDateId();
     }
 
 
     public void capture(Long signalId) {
+        log.info("开始执行任务：{}", signalId);
         Signal signal = signalRepository.getById(signalId);
         if (signal == null) {
             log.warn("signal {} not exist", signalId);
@@ -57,7 +58,7 @@ public class CameraCaptureService {
             return;
         }
         List<Camera> signalCameras = cameraRepository.getCamerasBySignalId(signal.getId());
-        SignalRunnerContext signalRunnerContext = new SignalRunnerContext(generateTaskId(), signal, signalCameras);
+        SignalRunnerContext signalRunnerContext = new SignalRunnerContext(signal.getCurrentTaskId(), signal, signalCameras);
         execute(signalRunnerContext);
     }
 

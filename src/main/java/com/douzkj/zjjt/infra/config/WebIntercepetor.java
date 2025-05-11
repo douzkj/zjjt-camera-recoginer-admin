@@ -1,6 +1,6 @@
 package com.douzkj.zjjt.infra.config;
 
-import com.douzkj.zjjt.entity.Response;
+import com.douzkj.zjjt.entity.R;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.annotation.Order;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -22,16 +22,16 @@ import static org.springframework.core.Ordered.HIGHEST_PRECEDENCE;
 public class WebIntercepetor  {
     @ExceptionHandler(value = Exception.class)
     @ResponseBody
-    public Response<Void> handleException(Exception e) {
+    public R<Void> handleException(Exception e) {
         // 自定义异常处理逻辑，例如记录日志、返回自定义错误信息等
         log.error("请求异常.... An error occurred: ", e);
-        return Response.fail("An error occurred: " + e.getMessage());
+        return R.fail("An error occurred: " + e.getMessage());
     }
 
     @ExceptionHandler(value = HttpClientErrorException.NotFound.class)
     @ResponseBody
-    public Response<Void> handlNotFound(Exception e) {
+    public R<Void> handlNotFound(Exception e) {
         // 自定义异常处理逻辑，例如记录日志、返回自定义错误信息等
-        return Response.fail404("Path not Found: " + e.getMessage());
+        return R.fail404("Path not Found: " + e.getMessage());
     }
 }

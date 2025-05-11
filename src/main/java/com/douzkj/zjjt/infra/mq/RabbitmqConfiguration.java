@@ -7,7 +7,7 @@ import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import static com.douzkj.zjjt.task.RecognizerQueue.RECOGNIZER_QUEUE;
+import static com.douzkj.zjjt.task.RecognizerQueue.*;
 
 /**
  * @author ranger dong
@@ -21,6 +21,16 @@ public class RabbitmqConfiguration {
     @Bean
     public Queue taskQueue() {
         return new Queue(RECOGNIZER_QUEUE, true);
+    }
+
+    @Bean
+    public Queue collectionQueue() {
+        return new Queue(COLLECTION_QUEUE, true);
+    }
+
+    @Bean
+    public Queue collectionQueueV2() {
+        return new Queue(COLLECTION_QUEUE_V2, true);
     }
 
     @Bean

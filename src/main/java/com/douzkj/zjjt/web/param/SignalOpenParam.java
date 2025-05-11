@@ -21,6 +21,6 @@ public class SignalOpenParam implements Serializable {
     @NotNull(message = "停止方式不能为空")
     private String stopType;
 
-    private Integer period;
+    private Double period;
 
 }

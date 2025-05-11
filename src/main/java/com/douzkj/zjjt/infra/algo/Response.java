@@ -9,7 +9,7 @@ public class Response<T> implements Serializable {
 
     private int code;
 
-    private String message;
+    private String msg;
 
     private T data;
 
