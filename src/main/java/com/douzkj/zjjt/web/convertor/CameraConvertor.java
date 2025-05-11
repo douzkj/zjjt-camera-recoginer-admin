@@ -7,6 +7,8 @@ import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;
 import org.mapstruct.factory.Mappers;
 
+import java.util.List;
+
 /**
  * @author ranger dong
  * @date 00:27 2025/3/24
@@ -22,4 +24,7 @@ public interface CameraConvertor {
             @Mapping(target = "hkMeta", expression = "java(cn.hutool.json.JSONUtil.toBean(camera.getHkMeta(), com.douzkj.zjjt.infra.hikvision.api.video.resource.entity.HikvisionCameraV2Model.class))")
     )
     CameraVO do2Vo(Camera camera);
+
+
+    List<CameraVO> do2Vo(List<Camera> camera);
 }

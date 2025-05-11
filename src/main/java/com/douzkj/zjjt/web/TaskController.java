@@ -1,8 +1,5 @@
 package com.douzkj.zjjt.web;
 
-import cn.hutool.core.date.DateUnit;
-import cn.hutool.core.date.DateUtil;
-import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.douzkj.zjjt.entity.R;
@@ -10,8 +7,10 @@ import com.douzkj.zjjt.infra.algo.AlgoServer;
 import com.douzkj.zjjt.infra.algo.Response;
 import com.douzkj.zjjt.infra.algo.entity.CleanupCount;
 import com.douzkj.zjjt.repository.TaskDetailRepository;
+import com.douzkj.zjjt.repository.TaskExportRepository;
 import com.douzkj.zjjt.repository.dao.TaskDetail;
-import com.douzkj.zjjt.service.DownloadService;
+import com.douzkj.zjjt.repository.dao.TaskExport;
+import com.douzkj.zjjt.service.ExporterService;
 import com.douzkj.zjjt.utils.TimeUtils;
 import com.douzkj.zjjt.web.convertor.TaskConvertor;
 import com.douzkj.zjjt.web.param.CleanupRequest;
@@ -21,14 +20,9 @@ import com.douzkj.zjjt.web.vo.DownloadVO;
 import com.douzkj.zjjt.web.vo.PageVO;
 import com.douzkj.zjjt.web.vo.TaskDetailVO;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.io.File;
-import java.io.IOException;
 
 @RestController()
 @RequestMapping("/tasks")
@@ -41,7 +35,12 @@ public class TaskController {
     private AlgoServer algoServer;
 
     @Autowired
-    private DownloadService downloadService;
+    private ExporterService exporterService;
+
+    @Autowired
+    private TaskExportRepository exportRepository;
+    @Autowired
+    private TaskExportRepository taskExportRepository;
 
     @RequestMapping("/page")
     public R<PageVO<TaskDetailVO>> page(TaskDetailPageRequest request) {
@@ -63,27 +62,24 @@ public class TaskController {
 
 
     @PostMapping("/download")
-    public R<DownloadVO> download(@RequestBody @Valid  DownloadRequest downloadRequest) throws IOException {
+    public R<DownloadVO> download(@RequestBody @Valid  DownloadRequest downloadRequest) throws Exception {
         String downloadId = TimeUtils.generateDateId();
-        File file = downloadService.startDownload(downloadId, downloadRequest);
+        TaskExport export = new TaskExport();;
+        export.setExportId(downloadId);
+        export.setStartedAtMs(System.currentTimeMillis());
+        boolean save = exportRepository.save(export);
+        if (save) {
+            exporterService.add(downloadId, downloadRequest);
+        }
         DownloadVO downloadVO = new DownloadVO();
         downloadVO.setDownloadId(downloadId);
-        downloadVO.setFilepath(file.getAbsolutePath());
         return R.success(downloadVO);
     }
 
 
-    @PostMapping("/download-list")
-    public R<Boolean> downloadList(@RequestBody TaskDetailPageRequest request) {
-        Wrapper<TaskDetail> wrapper = request.toWrapper();
-        int page = 1;
-        long pageSize = 100;
-        long latestPageSize = 100;
-        while (latestPageSize == pageSize) {
-            Page<TaskDetail> pageResult = taskDetailRepository.page(new Page<>(page, pageSize), wrapper);
-            latestPageSize = pageResult.getSize();
-        }
-
-        return R.success();
+    @GetMapping("/download/status")
+    public R<TaskExport> downloadList(@RequestParam("downloadId") String downloadId) {
+        TaskExport exporter = taskExportRepository.getByExportId(downloadId);
+        return R.success(exporter);
     }
 }

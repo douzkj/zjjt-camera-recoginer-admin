@@ -23,6 +23,7 @@
         <lombok-mapstruct-binding.version>0.2.0</lombok-mapstruct-binding.version>
         <org.projectlombok.version>1.18.22</org.projectlombok.version>
         <fastjson2.version>2.0.57</fastjson2.version>
+        <apache-compress.version>1.26.1</apache-compress.version>
     </properties>
 
     <dependencyManagement>
@@ -58,6 +59,11 @@
             <groupId>com.alibaba.fastjson2</groupId>
             <artifactId>fastjson2</artifactId>
             <version>${fastjson2.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-compress</artifactId>
+            <version>${apache-compress.version}</version>
         </dependency>
 
         <!-- Web 开发基础 -->

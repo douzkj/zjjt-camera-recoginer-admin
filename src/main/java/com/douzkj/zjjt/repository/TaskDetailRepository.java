@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.douzkj.zjjt.repository.dao.TaskDetail;
+import com.douzkj.zjjt.repository.dao.TaskExport;
 import com.douzkj.zjjt.repository.entity.TaskCollectCountVO;
 import com.douzkj.zjjt.repository.mapper.TaskDetailMapper;
 import org.springframework.stereotype.Repository;

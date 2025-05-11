@@ -16,7 +16,7 @@ import java.util.List;
 @Data
 public class TaskDetailPageRequest extends PageRequest implements Serializable {
 
-    private String cameraIndexCode;
+    private List<String> cameraIndexCode;
 
     private String cameraName;
 
@@ -35,8 +35,8 @@ public class TaskDetailPageRequest extends PageRequest implements Serializable {
 
     public Wrapper<TaskDetail> toWrapper() {
         LambdaQueryWrapper<TaskDetail> wrapper = Wrappers.<TaskDetail>lambdaQuery();
-        if (StringUtils.isNotBlank(getCameraIndexCode())) {
-            wrapper.eq(TaskDetail::getCameraIndexCode, getCameraIndexCode());
+        if ( ! CollectionUtils.isEmpty(getCameraIndexCode())) {
+            wrapper.in(TaskDetail::getCameraIndexCode, getCameraIndexCode());
         }
         if (StringUtils.isNotBlank(getCameraName())) {
             wrapper.like(TaskDetail::getCameraName,  getCameraName());

@@ -1,6 +1,7 @@
 package com.douzkj.zjjt.web;
 
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.douzkj.zjjt.entity.R;
 import com.douzkj.zjjt.infra.algo.AlgoServer;
@@ -82,6 +83,16 @@ public class CameraController {
             res = cameraRepository.bind(bindParam.getCameraIds(), signalId);
         }
         return R.success(res);
+    }
+
+    /**
+     * 绑定设备至指定通路
+     */
+    @GetMapping("/indexes")
+    public R<List<CameraVO>> indexes() {
+        List<Camera> list = cameraRepository.list(Wrappers.<Camera>lambdaQuery()
+                .select(Camera::getIndexCode));
+        return R.success(CameraConvertor.INSTANCE.do2Vo(list));
     }
 
     @PostMapping("/view")
