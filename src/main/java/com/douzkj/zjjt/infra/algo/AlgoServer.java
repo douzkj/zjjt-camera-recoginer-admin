@@ -5,11 +5,14 @@ import cn.hutool.json.JSONNull;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import com.douzkj.zjjt.infra.algo.entity.CleanupCount;
+import com.douzkj.zjjt.web.param.CleanupRequest;
 import com.google.common.collect.ImmutableMap;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Map;
 
 @Service
@@ -19,6 +22,7 @@ public class AlgoServer {
 
     private final AlgoServerProps algoServerProps;
 
+    private static final DateTimeFormatter CLEANUP_DATE_FORMAT = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
     /**
      * 读取帧
      * @param rtspUrl
@@ -28,8 +32,13 @@ public class AlgoServer {
         return get("/rtsp/frame", ImmutableMap.of("url", rtspUrl), String.class);
     }
 
-    public Response<CleanupCount> cleanupSimilarImages(String folder) {
-        return get("/task/cleanup/similar", ImmutableMap.of("folder", folder), CleanupCount.class);
+    public Response<CleanupCount> cleanupSimilarImages(CleanupRequest cleanupRequest) {
+        Map<String, Object> params = ImmutableMap.of(
+                "folder", cleanupRequest.getFolder(),
+                "start_time", cleanupRequest.getStart().format(CLEANUP_DATE_FORMAT),
+                "end_time", cleanupRequest.getEnd().format(CLEANUP_DATE_FORMAT)
+        );
+        return get("/task/cleanup/similar",params , CleanupCount.class);
     }
 
     protected <T> Response<T> unSerializer(String res, Class<T> clazz) {

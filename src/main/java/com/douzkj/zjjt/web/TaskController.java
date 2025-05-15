@@ -53,7 +53,7 @@ public class TaskController {
 
     @PostMapping("/cleanup")
     public R<CleanupCount> cleanup(@RequestBody CleanupRequest cleanupRequest) {
-        Response<CleanupCount> cleanupCountResponse = algoServer.cleanupSimilarImages(cleanupRequest.getFolder());
+        Response<CleanupCount> cleanupCountResponse = algoServer.cleanupSimilarImages(cleanupRequest);
         if (cleanupCountResponse.isOK()) {
             return R.success(cleanupCountResponse.getData());
         }

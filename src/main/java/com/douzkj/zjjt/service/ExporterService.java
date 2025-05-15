@@ -1,6 +1,8 @@
 package com.douzkj.zjjt.service;
 
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.douzkj.zjjt.repository.TaskDetailRepository;
 import com.douzkj.zjjt.repository.TaskExportRepository;
@@ -14,9 +16,9 @@ import org.apache.commons.compress.archivers.zip.ParallelScatterZipCreator;
 import org.apache.commons.compress.archivers.zip.UnixStat;
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
 import org.apache.commons.compress.archivers.zip.ZipArchiveOutputStream;
-import org.springframework.aop.framework.AopContext;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -103,7 +105,12 @@ public class ExporterService {
 
     public File startDownload(String downloadId, DownloadRequest downloadRequest) throws IOException, ExecutionException, InterruptedException {
         TaskDetailPageRequest pageRequest = downloadRequest.getPage();
-        Wrapper<TaskDetail> wrapper = pageRequest.toWrapper();
+        Wrapper<TaskDetail> wrapper;
+        if (! CollectionUtils.isEmpty(downloadRequest.getIdList())) {
+            wrapper = Wrappers.<TaskDetail>lambdaQuery().in(TaskDetail::getId, downloadRequest.getIdList());
+        } else {
+            wrapper = pageRequest.toWrapper();
+        }
         int total = taskDetailRepository.count(wrapper);
         long totalPages = (total + BATCH_SIZE - 1) / BATCH_SIZE;
         // 创建临时文件用于存储 ZIP 文件

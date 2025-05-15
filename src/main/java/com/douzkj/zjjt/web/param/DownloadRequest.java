@@ -5,6 +5,7 @@ import lombok.Data;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
+import java.util.List;
 
 @Data
 public class DownloadRequest implements Serializable {
@@ -15,6 +16,9 @@ public class DownloadRequest implements Serializable {
 
     @Valid
     private DownloadOptions options;
+
+
+    private List<Long> idList;
 
     @Data
     public static class DownloadOptions implements Serializable {
