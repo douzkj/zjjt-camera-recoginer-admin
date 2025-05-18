@@ -45,7 +45,7 @@ public class TaskController {
     @RequestMapping("/page")
     public R<PageVO<TaskDetailVO>> page(TaskDetailPageRequest request) {
         LambdaQueryWrapper<TaskDetail> wrapper = (LambdaQueryWrapper<TaskDetail>) request.toWrapper();
-        wrapper.orderByDesc(TaskDetail::getId);
+        wrapper.orderByDesc(TaskDetail::getFrameTimeMs);
         Page<TaskDetail> page = taskDetailRepository.page(new Page<>(request.getCurrent(), request.getPageSize()), wrapper);
         return R.success(PageVO.of(page, TaskConvertor.INSTANCE::do2Vo));
     }
