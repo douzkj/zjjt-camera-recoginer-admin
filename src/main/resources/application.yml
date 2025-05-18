@@ -69,3 +69,7 @@ alog:
   server:
     endpoint: ${ALGO_SERVER_ENDPOINT:http://localhost:9001}
 
+
+target:
+  classification: ${TARGET_CLASSIFICATION:/Users/rangerdong/codes/douzkj/zjjt-camera-recoginer/zjjt-camera-recoginer-algo/target_classification.json}
+  statistic: ${TARGET_STATISTIC:/Users/rangerdong/codes/douzkj/zjjt-camera-recoginer/zjjt-camera-recoginer-algo/data.json}
