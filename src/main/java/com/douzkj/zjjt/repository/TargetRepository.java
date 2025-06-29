@@ -36,6 +36,8 @@ public class TargetRepository {
         jsonObject.getJSONObject("number_of_images_per_category").forEach((key, value) -> {
             targetStatistic.getImages().put(key, (Integer) value);
         });
+        targetStatistic.setNumImages(jsonObject.getLong("num_images"));
+        targetStatistic.setNumInstances(jsonObject.getLong("num_instances"));
         return targetStatistic;
     }
 

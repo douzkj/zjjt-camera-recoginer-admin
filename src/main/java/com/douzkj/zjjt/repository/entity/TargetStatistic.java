@@ -12,4 +12,9 @@ public class TargetStatistic implements Serializable {
     private Map<String, Integer> instances = Maps.newHashMap();
 
     private Map<String, Integer> images = Maps.newHashMap();
+
+
+    private Long numImages;
+
+    private Long numInstances;
 }

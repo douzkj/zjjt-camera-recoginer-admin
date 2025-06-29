@@ -3,17 +3,15 @@ package com.douzkj.zjjt.web.vo;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.util.List;
 
 @Data
 public class TargetStatisticVO implements Serializable {
 
-    private String target;
+    private List<TargetStatisticItemVO> records;
 
-    private String targetName;
+    private Long numImages;
 
-    private String classification;
+    private Long numInstances;
 
-    private String statisticType;
-
-    private Integer value;
 }

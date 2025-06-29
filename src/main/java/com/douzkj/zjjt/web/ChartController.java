@@ -4,6 +4,7 @@ import com.douzkj.zjjt.entity.R;
 import com.douzkj.zjjt.repository.TargetRepository;
 import com.douzkj.zjjt.repository.dao.Target;
 import com.douzkj.zjjt.repository.entity.TargetStatistic;
+import com.douzkj.zjjt.web.vo.TargetStatisticItemVO;
 import com.douzkj.zjjt.web.vo.TargetStatisticVO;
 import com.google.common.collect.Lists;
 import lombok.Data;
@@ -23,26 +24,28 @@ public class ChartController {
 
     private final TargetRepository targetRepository;
 
-    protected TargetStatisticVO convert(Target target) {
-        TargetStatisticVO vo = new TargetStatisticVO();
+    protected TargetStatisticItemVO convert(Target target) {
+        TargetStatisticItemVO vo = new TargetStatisticItemVO();
         vo.setTarget(target.getTarget());
         vo.setTargetName(target.getTargetName());
         vo.setClassification(target.getClassification());
+        vo.setClassificationParentName(target.getClassificationParentName());
         vo.setValue(0);
         return vo;
     }
 
 
     @GetMapping("/statistic")
-    public R<List<TargetStatisticVO>> statistic() {
+    public R<TargetStatisticVO> statistic() {
         TargetStatistic targetStatistic = targetRepository.getTargetStatistic();
         List<Target> targets = targetRepository.getTargets();
-        List<TargetStatisticVO> vos = Lists.newArrayList();
+        TargetStatisticVO result = new TargetStatisticVO();
+        List<TargetStatisticItemVO> vos = Lists.newArrayList();
         for (Target target : targets) {
-            TargetStatisticVO instanceVo = convert(target);
+            TargetStatisticItemVO instanceVo = convert(target);
             instanceVo.setStatisticType(TYPE_INSTANCE);
             vos.add(instanceVo);
-            TargetStatisticVO imageVo = convert(target);
+            TargetStatisticItemVO imageVo = convert(target);
             imageVo.setStatisticType(TYPE_IMAGE);
             vos.add(imageVo);
         }
@@ -56,6 +59,9 @@ public class ChartController {
                     .filter(vo -> vo.getTarget().equals(key) && vo.getStatisticType().equals(TYPE_IMAGE))
                     .forEach(vo -> vo.setValue(value));
         });
-        return R.success(vos);
+        result.setRecords(vos);
+        result.setNumImages(targetStatistic.getNumImages());
+        result.setNumInstances(targetStatistic.getNumInstances());
+        return R.success(result);
     }
 }

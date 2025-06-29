@@ -11,4 +11,6 @@ public class Target implements Serializable {
     private String classification;
 
     private String targetName;
+
+    private String classificationParentName;
 }
