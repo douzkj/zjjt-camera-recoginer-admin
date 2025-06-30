@@ -4,6 +4,8 @@ import com.douzkj.zjjt.entity.R;
 import com.douzkj.zjjt.repository.TargetRepository;
 import com.douzkj.zjjt.repository.dao.Target;
 import com.douzkj.zjjt.repository.entity.TargetStatistic;
+import com.douzkj.zjjt.web.convertor.TargetConvertor;
+import com.douzkj.zjjt.web.vo.TargetLabelVO;
 import com.douzkj.zjjt.web.vo.TargetStatisticItemVO;
 import com.douzkj.zjjt.web.vo.TargetStatisticVO;
 import com.google.common.collect.Lists;
@@ -18,9 +20,9 @@ import static com.douzkj.zjjt.common.TargetConst.TYPE_IMAGE;
 import static com.douzkj.zjjt.common.TargetConst.TYPE_INSTANCE;
 
 @RestController
-@RequestMapping("/chart")
+@RequestMapping("/statistic")
 @Data
-public class ChartController {
+public class StatisticController {
 
     private final TargetRepository targetRepository;
 
@@ -35,8 +37,8 @@ public class ChartController {
     }
 
 
-    @GetMapping("/statistic")
-    public R<TargetStatisticVO> statistic() {
+    @GetMapping("/chart")
+    public R<TargetStatisticVO> chart() {
         TargetStatistic targetStatistic = targetRepository.getTargetStatistic();
         List<Target> targets = targetRepository.getTargets();
         TargetStatisticVO result = new TargetStatisticVO();
@@ -63,5 +65,12 @@ public class ChartController {
         result.setNumImages(targetStatistic.getNumImages());
         result.setNumInstances(targetStatistic.getNumInstances());
         return R.success(result);
+    }
+
+
+    @GetMapping("/tags")
+    public R<List<TargetLabelVO>> tags() {
+        List<Target> targets = targetRepository.getTargets();
+        return R.success(TargetConvertor.INSTANCE.do2LabelVO(targets));
     }
 }
