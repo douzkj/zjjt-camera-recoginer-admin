@@ -68,6 +68,37 @@ public class StatisticController {
     }
 
 
+    @GetMapping("/auto")
+    public R<TargetStatisticVO> autoLabel() {
+        TargetStatistic targetStatistic = targetRepository.getSystemAutoLabeledStatistic();
+        List<Target> targets = targetRepository.getTargets();
+        TargetStatisticVO result = new TargetStatisticVO();
+        List<TargetStatisticItemVO> vos = Lists.newArrayList();
+        for (Target target : targets) {
+            TargetStatisticItemVO instanceVo = convert(target);
+            instanceVo.setStatisticType(TYPE_INSTANCE);
+            vos.add(instanceVo);
+            TargetStatisticItemVO imageVo = convert(target);
+            imageVo.setStatisticType(TYPE_IMAGE);
+            vos.add(imageVo);
+        }
+        targetStatistic.getInstances().forEach((key, value) -> {
+            vos.stream()
+                    .filter(vo -> vo.getTarget().equals(key) && vo.getStatisticType().equals(TYPE_INSTANCE))
+                    .forEach(vo -> vo.setValue(value));
+        });
+        targetStatistic.getImages().forEach((key, value) -> {
+            vos.stream()
+                    .filter(vo -> vo.getTarget().equals(key) && vo.getStatisticType().equals(TYPE_IMAGE))
+                    .forEach(vo -> vo.setValue(value));
+        });
+        result.setRecords(vos);
+        result.setNumImages(targetStatistic.getNumImages());
+        result.setNumInstances(targetStatistic.getNumInstances());
+        return R.success(result);
+    }
+
+
     @GetMapping("/tags")
     public R<List<TargetLabelVO>> tags() {
         List<Target> targets = targetRepository.getTargets();

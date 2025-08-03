@@ -41,5 +41,21 @@ public class TargetRepository {
         return targetStatistic;
     }
 
+    public TargetStatistic getSystemAutoLabeledStatistic() {
+        File file = new File(targetProps.getSystem());
+        JSONObject jsonObject = JSONUtil.readJSONObject(file, Charsets.UTF_8);
+        TargetStatistic targetStatistic = new TargetStatistic();
+
+        jsonObject.getJSONObject("number_of_instances_per_category").forEach((key, value) -> {
+            targetStatistic.getInstances().put(key, (Integer) value);
+        });
+        jsonObject.getJSONObject("number_of_images_per_category").forEach((key, value) -> {
+            targetStatistic.getImages().put(key, (Integer) value);
+        });
+        targetStatistic.setNumImages(jsonObject.getLong("num_images"));
+        targetStatistic.setNumInstances(jsonObject.getLong("num_instances"));
+        return targetStatistic;
+    }
+
 
 }

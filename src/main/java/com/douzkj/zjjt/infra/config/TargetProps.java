@@ -12,4 +12,5 @@ public class TargetProps {
 
     private String classification;
     private String statistic;
+    private String system;
 }

@@ -73,3 +73,4 @@ alog:
 target:
   classification: ${TARGET_CLASSIFICATION:/Users/rangerdong/codes/douzkj/zjjt-camera-recoginer/zjjt-camera-recoginer-algo/target_classification.json}
   statistic: ${TARGET_STATISTIC:/Users/rangerdong/codes/douzkj/zjjt-camera-recoginer/zjjt-camera-recoginer-algo/data.json}
+  system: ${TARGET_SYSTEM:/Users/rangerdong/codes/douzkj/zjjt-camera-recoginer/zjjt-camera-recoginer-algo/sys-data.json}
