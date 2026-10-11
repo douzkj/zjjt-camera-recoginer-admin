@@ -4,8 +4,7 @@ import com.douzkj.zjjt.infra.hikvision.api.entity.ArtemisPageResponse;
 import com.douzkj.zjjt.infra.hikvision.api.entity.ArtemisResponse;
 import com.douzkj.zjjt.infra.hikvision.api.video.funcional.ArtemisVideoFunctionApi;
 import com.douzkj.zjjt.infra.hikvision.api.video.funcional.constant.VideoFunctionalConstant;
-import com.douzkj.zjjt.infra.hikvision.api.video.funcional.entity.CameraPreviewUrl;
-import com.douzkj.zjjt.infra.hikvision.api.video.funcional.entity.PreviewURLsRequest;
+import com.douzkj.zjjt.infra.hikvision.api.video.funcional.entity.*;
 import com.douzkj.zjjt.infra.hikvision.api.video.resource.ArtemisResourceApi;
 import com.douzkj.zjjt.infra.hikvision.api.video.resource.ArtemisVideoResourceApi;
 import com.douzkj.zjjt.infra.hikvision.api.video.resource.entity.HikvisionCameraModel;
@@ -106,6 +105,28 @@ public class HikvisionService {
 
     }
 
+
+    public String capture(String cameraIndexCode) {
+        try {
+            ArtemisResponse<CapturePicUrl> response = artemisVideoFunctionApi.capture(cameraIndexCode);
+            if (response.isSuccess()) {
+                return response.getData().getPicUrl();
+            }
+        } catch (Exception e) {
+            log.error("抓取照片失败。 codes={}",  cameraIndexCode, e);
+        }
+        return null;
+    }
+
+
+    public ArtemisPageResponse<CapturePic> capture(CapturePicSearchRequest searchRequest) {
+        try {
+            return artemisVideoFunctionApi.captureSearch(searchRequest);
+        } catch (Exception e) {
+            log.error("抓取照片失败。 request={}",  searchRequest, e);
+        }
+        return null;
+    }
 
     public Long getCameraSyncIntervalSeconds() {
         return config.getCameraIntervalSeconds();

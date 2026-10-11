@@ -6,6 +6,7 @@ import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import com.douzkj.zjjt.infra.algo.entity.CleanupCount;
 import com.douzkj.zjjt.web.param.CleanupRequest;
+import com.douzkj.zjjt.web.vo.AlgoRecoVO;
 import com.google.common.collect.ImmutableMap;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
@@ -41,6 +42,11 @@ public class AlgoServer {
         return get("/task/cleanup/similar",params , CleanupCount.class);
     }
 
+
+    public Response<AlgoRecoVO> annotationImage(String filepath, String id) {
+        return annotationPost("/algo/reco/annotation", ImmutableMap.of("filepath", filepath, "id", id), AlgoRecoVO.class);
+    }
+
     protected <T> Response<T> unSerializer(String res, Class<T> clazz) {
         JSONObject entries = JSONUtil.parseObj(res);
         Response<T> response = new Response<>();
@@ -71,6 +77,12 @@ public class AlgoServer {
 
     protected  <T> Response<T> post(String path, Object data, Class<T> clazz) {
         String url = algoServerProps.getEndpoint() + path;
+        String s = HttpUtil.post(url, JSONUtil.toJsonStr(data));
+        return unSerializer(s, clazz);
+    }
+
+    protected  <T> Response<T> annotationPost(String path, Object data, Class<T> clazz) {
+        String url = algoServerProps.getAnnotationEndpoint() + path;
         String s = HttpUtil.post(url, JSONUtil.toJsonStr(data));
         return unSerializer(s, clazz);
     }

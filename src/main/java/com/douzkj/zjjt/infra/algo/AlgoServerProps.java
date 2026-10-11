@@ -11,4 +11,8 @@ import org.springframework.stereotype.Component;
 public class AlgoServerProps {
 
     private String endpoint;
+
+    private String annotationEndpoint;
+
+    private String annotationTempDir;
 }

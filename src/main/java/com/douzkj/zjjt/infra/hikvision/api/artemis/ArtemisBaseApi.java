@@ -57,6 +57,9 @@ public class ArtemisBaseApi {
         response.setCode(entries.getStr("code"));
         response.setMsg(entries.getStr("msg"));
         JSONObject data = entries.getJSONObject("data");
+        if (data == null) {
+            return response;
+        }
         ArtemisPageResponse.ArtemisPageData<T> pageData = new ArtemisPageResponse.ArtemisPageData<>();
         pageData.setTotal(data.getInt("total"));
         pageData.setPageNo(data.getInt("pageNo"));

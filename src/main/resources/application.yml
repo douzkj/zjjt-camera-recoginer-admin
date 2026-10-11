@@ -20,12 +20,21 @@ spring:
     buffer-size: 1024
     # 是否使用直接内存
     direct-buffers: true
+    multipart-config:
+      max-file-size: 100MB
+      max-request-size: 100MB
+      enabled: true
+  servlet:
+    multipart:
+      max-file-size: 100MB
+      max-request-size: 100MB
+      enabled: true
 
   rabbitmq:
     host: ${RABBITMQ_HOST:localhost}
     port: ${RABBITMQ_PORT:5672}
     username: ${RABBITMQ_USER:admin}
-    password:  ${RABBITMQ_PASS:admin}
+    password:  ${RABBITMQ_PASS:123456}
     virtual-host: ${RABBITMQ_VHOST:/}
     publisher-confirm-type: correlated  # 启用异步确认
     publisher-returns: true             # 启用退回机制
@@ -68,6 +77,10 @@ hikvision:
 alog:
   server:
     endpoint: ${ALGO_SERVER_ENDPOINT:http://localhost:9001}
+    annotation-endpoint: ${ALGO_SERVER_ANNOTATION_ENDPOINT:http://localhost:9003}
+    annotation-temp-dir: ${ALGO_SERVER_ANNOTATION_TEMP_DIR:./temp}
+
+
 
 
 target:

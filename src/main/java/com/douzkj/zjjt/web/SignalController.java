@@ -77,12 +77,12 @@ public class SignalController {
                 cameraCountMap = Maps.newHashMap();
             }
             // 获取任务的总量数据
-            List<TaskCollectCountVO> taskCollectCountVOS = taskDetailRepository.countImageBySignalIds(signalIds);
-            if (! CollectionUtils.isEmpty(taskCollectCountVOS)) {
-                collectCountMap = taskCollectCountVOS.stream().collect(Collectors.toMap(TaskCollectCountVO::getSignalId, t -> t));
-            } else {
+//            List<TaskCollectCountVO> taskCollectCountVOS = taskDetailRepository.countImageBySignalIds(signalIds);
+//            if (! CollectionUtils.isEmpty(taskCollectCountVOS)) {
+//                collectCountMap = taskCollectCountVOS.stream().collect(Collectors.toMap(TaskCollectCountVO::getSignalId, t -> t));
+//            } else {
                 collectCountMap = Maps.newHashMap();
-            }
+//            }
         } else {
             collectCountMap = Maps.newHashMap();
             cameraCountMap = Maps.newHashMap();

@@ -1,5 +1,8 @@
 package com.douzkj.zjjt;
 
+import com.douzkj.zjjt.infra.hikvision.api.entity.ArtemisPageResponse;
+import com.douzkj.zjjt.infra.hikvision.api.video.funcional.entity.CapturePic;
+import com.douzkj.zjjt.infra.hikvision.api.video.funcional.entity.CapturePicSearchRequest;
 import com.douzkj.zjjt.infra.hikvision.api.video.resource.entity.HikvisionCameraModel;
 import com.douzkj.zjjt.infra.hikvision.api.video.resource.entity.HikvisionRegionModel;
 import com.douzkj.zjjt.infra.hikvision.config.ArtemisConfigProps;
@@ -12,6 +15,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
 
@@ -44,7 +49,7 @@ public class HikvisionTest {
 
     @Test
     public void getRtspUrl() {
-        String cameraRtspUrl = hikvisionService.getCameraRtspUrl("0830b36563804ce390db5fb02810102a");
+        String cameraRtspUrl = hikvisionService.getCameraRtspUrl("39a647d3b4f34db5b7290b44d8aaa7c7");
         System.out.println(cameraRtspUrl);
     }
 
@@ -57,5 +62,29 @@ public class HikvisionTest {
     @Test
     public void syncCamera() {
         hikCameraSyncScheduler.syncCamera();
+    }
+
+    @Test
+    public void captrue() {
+        String capture = hikvisionService.capture("5bc7eace54644d6bacf836d9818f4118");
+        System.out.println("手动抓图的图片结果:" + capture);
+    }
+
+
+    @Test
+    public void captureSearch() {
+
+        CapturePicSearchRequest searchRequest = new CapturePicSearchRequest();
+        searchRequest.setPageSize(100);
+        searchRequest.setPageNo(1);
+        searchRequest.setCameraIndexCodes(Lists.newArrayList("f5649d247dfc417a805a8c2d21eb7e60"));
+        ZonedDateTime now = ZonedDateTime.now().withHour(0).withMinute(0).withSecond(0).withNano(0);
+        ZonedDateTime endTime = now.plusDays(1);
+        searchRequest.setStartTime(now.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME));
+        searchRequest.setEndTime(endTime.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME));
+
+        ArtemisPageResponse<CapturePic> capture = hikvisionService.capture(searchRequest);
+        System.out.println(capture);
+
     }
 }

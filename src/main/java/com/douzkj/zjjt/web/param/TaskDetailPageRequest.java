@@ -57,15 +57,17 @@ public class TaskDetailPageRequest extends PageRequest implements Serializable {
             wrapper.le(TaskDetail::getFrameTimeMs, this.getFrameEndMs());
         }
         if ( ! CollectionUtils.isEmpty(this.getLabels())) {
-            boolean isFirst = false;
-            for (String labelType : this.getLabels()) {
-                if (! isFirst) {
-                    isFirst = true;
-                    wrapper.apply("find_in_set({0}, label_types) > 0", labelType);
-                } else {
-                    wrapper.or().apply("find_in_set({0}, label_types) > 0", labelType);
+            wrapper.and(w -> {
+                boolean isFirst = false;
+                for (String labelType : this.getLabels()) {
+                    if (! isFirst) {
+                        isFirst = true;
+                        w.apply("find_in_set({0}, label_types) > 0", labelType);
+                    } else {
+                        w.or().apply("find_in_set({0}, label_types) > 0", labelType);
+                    }
                 }
-            }
+            });
         }
         return wrapper;
     }
