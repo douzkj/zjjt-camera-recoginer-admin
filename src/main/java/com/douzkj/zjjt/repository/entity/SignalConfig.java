@@ -23,4 +23,8 @@ public class SignalConfig implements Serializable {
     @Valid
     private SignalAlgoConfig algo;
 
+    @NotNull
+    @Valid
+    private SignalVideoConfig video = new SignalVideoConfig();
+
 }
